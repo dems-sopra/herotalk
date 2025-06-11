@@ -16,23 +16,15 @@ function HeroSelectionPage() {
 
   const handleHeroClick = (hero) => {
     setSelectedHero(hero);
-    setMessages([]); // reset chat when hero changes
+    setMessages([]);
   };
 
   const handleSend = () => {
     if (!input.trim()) return;
 
-    const fakeTranslation = {
-      scooby: 'Scooby a peur, mais il est prêt à aider !',
-      jerry: 'Jerry veut manger du fromage 🍕',
-      pikachu: 'Pikachu est plein d’énergie ⚡',
-      simba: 'Simba affirme sa royauté 🦁',
-      donald: 'Donald est fâché 😡',
-    };
-
     const message = {
       text: input,
-      translation: fakeTranslation[selectedHero.id] || 'Traduction non disponible',
+      translation: 'Here would come the translation.....', // Placeholder for future AI translation
     };
 
     setMessages([...messages, message]);
@@ -45,30 +37,33 @@ function HeroSelectionPage() {
 
   return (
     <div className="hero-selection-container">
-      <h1>Select the Hero you want to understand...</h1>
-
-      <div className="hero-grid">
-        {heroes.map((hero) => (
-          <div
-            key={hero.id}
-            className={`hero-card ${selectedHero?.id === hero.id ? 'selected' : ''}`}
-            onClick={() => handleHeroClick(hero)}
-          >
-            <img src={hero.image} alt={hero.name} className="hero-img" />
-            <div className="hero-name">{hero.name}</div>
-          </div>
-        ))}
+      <div className="hero-selection-header">
+        <h1>Select the Hero You Want to Understand</h1>
+        <div className="hero-grid">
+          {heroes.map((hero) => (
+            <div
+              key={hero.id}
+              className={`hero-card ${selectedHero?.id === hero.id ? 'selected' : ''}`}
+              onClick={() => handleHeroClick(hero)}
+            >
+              <img src={hero.image} alt={hero.name} className="hero-img" />
+              <div className="hero-name">{hero.name}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {selectedHero && (
         <div className="chat-section">
-          <h2>💬 The hero that is currently speaking is  : {selectedHero.name}</h2>
+          <p className="chat-info">
+            The hero currently selected is: <strong>{selectedHero.name}</strong>
+          </p>
 
           <div className="chat-box">
             {messages.map((msg, index) => (
               <div key={index} className="chat-bubble">
-                <strong>{selectedHero.name} :</strong> {msg.text}
-                <div className="chat-translation">🧠 {msg.translation}</div>
+                <strong>{selectedHero.name}:</strong> {msg.text}
+                <div className="chat-translation">Translated: {msg.translation}</div>
               </div>
             ))}
           </div>
@@ -76,13 +71,17 @@ function HeroSelectionPage() {
           <div className="chat-input-area">
             <input
               type="text"
-              placeholder="Écris ton message..."
+              placeholder="Type your message..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
             />
-            <button className="send-button" onClick={handleSend}>Envoyer</button>
-            <button className="mic-button">🎤</button>
+            <button className="send-button" onClick={handleSend}>
+              Send
+            </button>
+            <button className="mic-button" title="Voice input (coming soon)">
+              🎤
+            </button>
           </div>
         </div>
       )}
