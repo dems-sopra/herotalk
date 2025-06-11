@@ -1,0 +1,11 @@
+.countdown-timer {
+  margin-top: 30px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffdd00;
+  text-align: center;
+}
+
+.countdown-timer.expired {
+  color: red;
+} 

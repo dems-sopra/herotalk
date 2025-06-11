@@ -40,4 +40,10 @@
     flex: 1;
     padding: 40px;
     background-color: #f5f6f8;
+  }
+  
+  .sidebar .countdown-timer {
+    margin-top: 40px;
+    font-size: 20px;
+    text-align: center;
   }  

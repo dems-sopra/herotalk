@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Layout.css';
+import CountdownTimer from './CountdownTimer';
 
 function Layout({ children }) {
   const location = useLocation();
@@ -20,6 +21,7 @@ function Layout({ children }) {
             <Link to="/rewards">Rewards</Link>
           </li>
         </ul>
+        <CountdownTimer />
       </nav>
 
       <main className="main-content">
