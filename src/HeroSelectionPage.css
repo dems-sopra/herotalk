@@ -1,0 +1,79 @@
+.hero-selection-container {
+  padding: 40px 20px;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fff;
+}
+
+h1 {
+  font-size: 32px;
+  margin-bottom: 30px;
+}
+
+.hero-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+}
+
+.hero-card {
+  width: 140px;
+  height: 160px;
+  background-color: #f9f9f9;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease, border 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.hero-card:hover {
+  transform: scale(1.05);
+}
+
+.hero-card.selected {
+  border: 3px solid #4da6ff;
+  background-color: #e6f3ff;
+}
+
+.hero-img {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.hero-name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.voice-ui {
+  margin-top: 40px;
+}
+
+.voice-ui h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.voice-button {
+  padding: 12px 24px;
+  background-color: #4da6ff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.voice-button:hover {
+  background-color: #3399ff;
+}
