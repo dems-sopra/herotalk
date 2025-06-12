@@ -1,89 +1,95 @@
-# HeroTalk 🚀
+# 🦸‍♂️ HeroTalk
 
-HeroTalk is a React web application that lets users
-1. talk to (and translate for) famous cartoon heroes;
-2. guide those heroes from any city in the world to the United Nations Headquarters within 24 h (road + sea routing).
-
-The project is split into two parts:
-* **Client** – React (Create React App) inside the repository root.
-* **Server** – a tiny Node/Express proxy in `server/` that hides the SeaRoutes API key and bypasses CORS.
+**HeroTalk** is a mobile-first web app that allows users to communicate with non-speaking animated heroes, reward their actions, and assist them in reaching their headquarters. This project was built for a hackathon with creativity, collaboration, and accessibility in mind.
 
 ---
-## Prerequisites
-* Node ≥ 18
-* npm or pnpm / yarn
+
+## 📱 Pages & Features
+
+### 🔹 Translator Page (Hero Selection)
+- Choose a hero (e.g. Pikachu, Scooby, Goku)
+- Type or simulate a voice message on their behalf
+- Automatically generate a mission-style translation
+- Mobile-friendly chat interface
+
+### 🔹 Reward Page
+- Select your hero identity
+- Choose another hero to reward
+- Grant 10, 50, or 100 points
+- Live leaderboard display
+- History of rewards shown on button click
+
+### 🔹 Navigation Page
+- Enter your location to guide a hero to the UN HQ (New York)
+- Interactive map powered by Leaflet.js
+- Displays travel time and distance
+- Countdown timer included
 
 ---
-## Setup
+
+## 🧪 Tech Stack
+
+- **React** (Create React App)
+- **React Router DOM** (Navigation)
+- **React Icons** (UI Icons)
+- **Leaflet.js** (Map navigation)
+- **CSS** (Responsive, mobile-first)
+- **LocalStorage** (Store leaderboard & messages locally)
+
+---
+
+## 🚀 Setup Instructions
+
+1. Clone the repository:
 ```bash
-# Clone & enter repository
-git clone <repo-url>
+git clone https://github.com/your-username/herotalk.git
 cd herotalk
+```
 
-# Install client dependencies
+2. Install dependencies:
+```bash
 npm install
+```
 
-# Install proxy dependencies
-npm install --prefix server
+3. Start development server:
+```bash
+npm start
+```
+
+4. Open on your phone (same Wi-Fi):
+```
+http://YOUR_LOCAL_IP:3000
 ```
 
 ---
-## Environment variables
-Create `server/.env` (not committed – see `.gitignore`):
+
+## 📁 Project Structure
+
 ```
-SEAROUTES_KEY=YOUR_SEAROUTES_API_KEY
-PORT=8080            # optional, defaults to 8080
-```
-You can generate a free SeaRoutes key from https://my.searoutes.com (≈2 000 calls / month).
-
----
-## Development workflow
-Open **two** terminals:
-
-1. Start the SeaRoutes proxy (port 8080):
-   ```bash
-   npm start --prefix server
-   ```
-2. Start the React dev-server (port 3000):
-   ```bash
-   npm start
-   ```
-Then browse to http://localhost:3000.
-
----
-## Available npm scripts (root)
-* `npm start` – start CRA dev server.
-* `npm test` – run test suite.
-* `npm run build` – production build in `build/`.
-* `npm run proxy` – alias for `npm start --prefix server`.
-
----
-## Folder structure
-```
-herotalk/
-│  README.md
-│  .gitignore
-│  package.json            # client
-│
-├─src/                     # React source
-│   ├─App.js
-│   ├─NavigationPage.js    # mapping + routing logic
-│   └─…
-│
-└─server/                  # Express proxy → SeaRoutes
-    ├─index.js             # /api/sea  /api/nearest-port /api/ports-by-country
-    ├─package.json
-    └─.env.example         # template for env vars
+src/
+  ├── pages/
+  │   ├── HeroSelectionPage.js
+  │   ├── RewardsPage.js
+  │   └── NavigationPage.js
+  ├── Layout.js
+  ├── App.js
+public/
+  └── heroes/  # hero images like scooby.png, pikachu.png, etc.
 ```
 
 ---
-## Deployment (production)
-1. Build the client:
-   ```bash
-   npm run build
-   ```
-2. Serve the contents of `build/` **and** run the proxy on the same origin (e.g. Nginx reverse-proxy to port 8080). This avoids CORS in production.
+
+## 🌍 Demo Usage
+
+To simulate voice:
+- Click the mic icon 🎤
+- A pre-written message will auto-fill and "send"
+- Hero translation is randomly shown
 
 ---
-## License
-MIT © 2025 HeroTalk contributors
+
+## 📌 License
+
+MIT — Free to use, improve and share.
+
+Built with ❤️ for fun and creativity.
