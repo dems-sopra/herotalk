@@ -91,5 +91,3 @@ To simulate voice:
 ## 📌 License
 
 MIT — Free to use, improve and share.
-
-Built with ❤️ for fun and creativity.
