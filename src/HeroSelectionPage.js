@@ -2,12 +2,66 @@ import React, { useState } from 'react';
 import './HeroSelectionPage.css';
 
 const heroes = [
-  { id: 'scooby', name: 'Scooby', image: '/heroes/scooby.png' },
-  { id: 'jerry', name: 'Jerry', image: '/heroes/jerry.png' },
-  { id: 'pikachu', name: 'Pikachu', image: '/heroes/pikachu.png' },
-  { id: 'simba', name: 'Simba', image: '/heroes/simba.png' },
-  { id: 'donald', name: 'Donald', image: '/heroes/donald.png' },
-  { id: 'goku', name: 'Son Goku', image: '/heroes/goku.png' },
+  {
+    id: 'scooby',
+    name: 'Scooby',
+    image: '/heroes/scooby.png',
+    phrases: [
+      "I smell something suspicious!",
+      "We need to run now!",
+      "Where's Shaggy?!"
+    ]
+  },
+  {
+    id: 'jerry',
+    name: 'Jerry',
+    image: '/heroes/jerry.png',
+    phrases: [
+      "Be careful, enemy is coming!",
+      "We need to move silently.",
+      "Tom is close, take the other route."
+    ]
+  },
+  {
+    id: 'pikachu',
+    name: 'Pikachu',
+    image: '/heroes/pikachu.png',
+    phrases: [
+      "I need more electricity!",
+      "My power is low, find a charger!",
+      "Stay close, danger ahead!"
+    ]
+  },
+  {
+    id: 'simba',
+    name: 'Simba',
+    image: '/heroes/simba.png',
+    phrases: [
+      "We must protect the pride!",
+      "Hyenas are surrounding us!",
+      "The way is blocked, take the cliff!"
+    ]
+  },
+  {
+    id: 'donald',
+    name: 'Donald',
+    image: '/heroes/donald.png',
+    phrases: [
+      "We're running out of time!",
+      "Hold the elevator, I'm coming!",
+      "The HQ door is locked!"
+    ]
+  },
+  {
+    id: 'goku',
+    name: 'Son Goku',
+    image: '/heroes/goku.png',
+    phrases: [
+      "Let me power up — buy us some time!",
+      "This elevator isn't strong enough for Ultra Instinct!",
+      "Teleporting... see you at HQ!"
+    ]
+  }
 ];
 
 function HeroSelectionPage() {
@@ -21,11 +75,15 @@ function HeroSelectionPage() {
   };
 
   const handleSend = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !selectedHero) return;
+
+    const randomPhrase = selectedHero.phrases[
+      Math.floor(Math.random() * selectedHero.phrases.length)
+    ];
 
     const message = {
       text: input,
-      translation: 'Here would come the translation.....', // Placeholder for future AI translation
+      translation: randomPhrase
     };
 
     setMessages([...messages, message]);
@@ -35,6 +93,21 @@ function HeroSelectionPage() {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') handleSend();
   };
+
+  const simulateVoiceInput = () => {
+    if (!selectedHero) return;
+  
+    const simulatedInputs = [
+      "Recording voice message...",
+    ];
+  
+    const randomText = simulatedInputs[Math.floor(Math.random() * simulatedInputs.length)];
+    setInput(randomText);
+  
+    setTimeout(() => {
+      handleSend();
+    }, 600); // Simulate short delay
+  };  
 
   return (
     <div className="hero-selection-container">
@@ -80,7 +153,7 @@ function HeroSelectionPage() {
             <button className="send-button" onClick={handleSend}>
               Send
             </button>
-            <button className="mic-button" title="Voice input (coming soon)">
+            <button className="mic-button" onClick={simulateVoiceInput} title="Simulate voice input">
               🎤
             </button>
           </div>
