@@ -7,6 +7,7 @@ const heroes = [
   { id: 'pikachu', name: 'Pikachu', image: '/heroes/pikachu.png' },
   { id: 'simba', name: 'Simba', image: '/heroes/simba.png' },
   { id: 'donald', name: 'Donald', image: '/heroes/donald.png' },
+  { id: 'goku', name: 'Son Goku', image: '/heroes/goku.png' },
 ];
 
 function HeroSelectionPage() {
