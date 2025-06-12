@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiMessageSquare, FiGift, FiMap } from 'react-icons/fi';
 import './Layout.css';
+import CountdownTimer from './CountdownTimer';
 
 function Layout({ children }) {
   const location = useLocation();
@@ -9,6 +10,7 @@ function Layout({ children }) {
   return (
     <div className="layout-wrapper">
       <main className="main-content">
+        <CountdownTimer />
         {children}
       </main>
 
