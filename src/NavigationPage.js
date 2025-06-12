@@ -1,35 +1,50 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Polyline, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Polyline, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import markerIconPng from 'leaflet/dist/images/marker-icon.png';
-import markerIconRetina from 'leaflet/dist/images/marker-icon-2x.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 const HQ_COORDS = [40.748876, -73.968009]; // UN Headquarters in NYC
 
-// Photo réelle du siège de l'ONU à placer dans public/hq.jpg
-const hqIcon = new L.Icon({
-  iconUrl: '/hq.jpg',
-  iconSize: [50, 50],
-  iconAnchor: [25, 50],
-  popupAnchor: [0, -50],
-  className: 'hq-marker-icon',
-});
+const SEA_TOKEN = 'QobuoO29sE5ZhBpLcFHyLTXZxC6gb6X6KiKWAEXc';
 
-// Icône symbole pour le HQ (bâtiment stylisé). Placez hq-icon.png dans public/
-const hqSymbol = new L.Icon({
-  iconUrl: '/hq-icon.png',
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-  popupAnchor: [0, -40],
-});
+const STATIC_PORTS = [
+  { name: 'Port of New York', country: 'United States', coords: [40.6848, -74.1628] },
+  { name: 'Port of Los Angeles', country: 'United States', coords: [33.732, -118.27] },
+  { name: 'Port of Le Havre', country: 'France', coords: [49.483, 0.105] },
+  { name: 'Port of Rotterdam', country: 'Netherlands', coords: [51.95, 4.14] },
+  { name: 'Port of Casablanca', country: 'Morocco', coords: [33.599, -7.64] },
+  { name: 'Port of Tanger Med', country: 'Morocco', coords: [35.8804, -5.5263] },
+  { name: 'Port of Shanghai', country: 'China', coords: [31.4, 121.5] },
+  { name: 'Port of Mumbai', country: 'India', coords: [18.95, 72.84] },
+  { name: 'Port of Mundra', country: 'India', coords: [22.73, 69.7] },
+  { name: 'Port of Santos', country: 'Brazil', coords: [-23.96, -46.328] },
+  { name: 'Port of Durban', country: 'South Africa', coords: [-29.87, 31.02] },
+  { name: 'Port of Sydney', country: 'Australia', coords: [-33.86, 151.2] },
+  { name: 'Port of Yokohama', country: 'Japan', coords: [35.45, 139.64] },
+];
 
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIconRetina,
-  iconUrl: markerIconPng,
-  shadowUrl: markerShadow,
-});
+const haversine = (a, b) => {
+  const toRad = (v) => (v * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(b[0] - a[0]);
+  const dLon = toRad(b[1] - a[1]);
+  const lat1 = toRad(a[0]);
+  const lat2 = toRad(b[0]);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+};
+
+async function fetchSeaRoute(origin, dest) {
+  const url =
+    `http://localhost:8080/api/sea?oriLat=${origin[0]}&oriLon=${origin[1]}` +
+    `&destLat=${dest[0]}&destLon=${dest[1]}`;
+
+  const res = await fetch(url);
+
+  if (!res.ok) throw new Error('Sea routing failed');
+  const geo = await res.json();
+  const coordsLonLat = geo.features[0].geometry.coordinates;
+  return coordsLonLat.map(([lon, lat]) => [lat, lon]);
+}
 
 function fetchRoute(start, end) {
   const url = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`;
@@ -51,29 +66,57 @@ async function geocodeCity(city, country) {
   throw new Error('City not found');
 }
 
-// Calcule une route "maritime" simplifiée : ligne droite entre l'origine et le HQ
-function buildSeaPath(start, end, steps = 100) {
-  const path = [];
-  for (let i = 0; i <= steps; i += 1) {
-    const t = i / steps;
-    const lat = start[0] + (end[0] - start[0]) * t;
-    const lon = start[1] + (end[1] - start[1]) * t;
-    path.push([lat, lon]);
-  }
-  return path;
-}
-
 function NavigationPage() {
   const [userPos, setUserPos] = useState(null);
   const [route, setRoute] = useState(null);
   const [error, setError] = useState('');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
-  const [portCity, setPortCity] = useState('');
-  const [portCountry, setPortCountry] = useState('');
-  const [portCoords, setPortCoords] = useState(null);
+  const HQ_PORT = { name: 'Port of New York', coords: [40.6848, -74.1628] };
+
+  const [startPort, setStartPort] = useState(null);
   const [roadToPort, setRoadToPort] = useState(null);
+  const [seaPath, setSeaPath] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Fetch nearest port when user position is known
+  useEffect(() => {
+    const run = async () => {
+      if (!userPos) return;
+      const computeDriving = async (from, to) => {
+        const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=false`;
+        const json = await fetch(url).then((r) => r.json());
+        return json.code === 'Ok' ? json.routes[0].distance : Infinity;
+      };
+
+      const pickShortestPort = async (ports) => {
+        let best = null;
+        let bestDist = Infinity;
+        for (const port of ports) {
+          const dist = await computeDriving(userPos, port.coords);
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = port;
+          }
+        }
+        return best;
+      };
+
+      let chosen;
+
+      // Préfiltrer par pays si renseigné
+      const candidatePorts = STATIC_PORTS.filter((p) =>
+        (!country ? true : p.country?.toLowerCase() === country.toLowerCase()),
+      );
+
+      if (!chosen) {
+        chosen = await pickShortestPort(candidatePorts.length ? candidatePorts : STATIC_PORTS);
+      }
+
+      setStartPort(chosen);
+    };
+    run();
+  }, [userPos]);
 
   // Acquire user position via Geolocation API (optionnel)
   useEffect(() => {
@@ -103,6 +146,29 @@ function NavigationPage() {
     }
   }, [userPos]);
 
+  // Road route to start port whenever both positions are known
+  useEffect(() => {
+    if (!userPos || !startPort?.coords) return;
+    if (!Array.isArray(startPort.coords) || startPort.coords.length !== 2) return;
+    fetchRoute(userPos, startPort.coords)
+      .then((data) => {
+        if (data.code === 'Ok') setRoadToPort(data.routes[0]);
+      })
+      .catch(() => {});
+  }, [userPos, startPort]);
+
+  // Fetch sea route when startPort is defined
+  useEffect(() => {
+    if (!startPort?.coords || startPort.coords.length !== 2) return;
+    fetchSeaRoute(startPort.coords, HQ_PORT.coords)
+      .then((path) => {
+        setSeaPath(path);
+      })
+      .catch(() => {
+        setError('Sea routing failed');
+      });
+  }, [startPort]);
+
   // Gestion du formulaire manuel
   const handleManualSubmit = async (e) => {
     e.preventDefault();
@@ -117,19 +183,11 @@ function NavigationPage() {
       setUserPos(coords);
       setError('');
 
-      if (portCity && portCountry) {
-        // géocoder port
-        try {
-          const pcoords = await geocodeCity(portCity, portCountry);
-          setPortCoords(pcoords);
-          // route route -> port
-          const dataPort = await fetchRoute(coords, pcoords);
-          if (dataPort.code === 'Ok') setRoadToPort(dataPort.routes[0]);
-        } catch {
-          setError('Port city not found');
-        }
+      if (startPort) {
+        // route route -> port
+        const dataPort = await fetchRoute(coords, startPort.coords);
+        if (dataPort.code === 'Ok') setRoadToPort(dataPort.routes[0]);
       } else {
-        setPortCoords(null);
         setRoadToPort(null);
       }
     } catch (err) {
@@ -193,20 +251,20 @@ function NavigationPage() {
             style={{ height: '500px', width: '100%', marginTop: '20px', borderRadius: '12px' }}
           >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <Marker position={userPos}>
-              <Popup>Current position</Popup>
-            </Marker>
-            <Marker position={HQ_COORDS} icon={hqSymbol}>
+            <CircleMarker center={userPos} radius={8} pathOptions={{ color: 'red' }}>
+              <Popup>Start position</Popup>
+            </CircleMarker>
+            <CircleMarker center={HQ_COORDS} radius={8} pathOptions={{ color: 'green' }}>
               <Popup>UN Headquarters</Popup>
-            </Marker>
+            </CircleMarker>
             {roadToPort ? (
               <Polyline positions={roadToPort.geometry.coordinates.map((c)=>[c[1], c[0]])} color="blue" />
             ) : (
               <Polyline positions={route.geometry.coordinates.map((c) => [c[1], c[0]])} color="blue" />
             )}
             {/* Maritime path */}
-            {portCoords && (
-              <Polyline positions={buildSeaPath(portCoords, HQ_COORDS)} color="cyan" dashArray="4" />
+            {seaPath && (
+              <Polyline positions={seaPath} color="cyan" dashArray="4" />
             )}
           </MapContainer>
           <p style={{ marginTop: '10px' }}>

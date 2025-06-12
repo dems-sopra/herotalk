@@ -1,70 +1,89 @@
-# Getting Started with Create React App
+# HeroTalk 🚀
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+HeroTalk is a React web application that lets users
+1. talk to (and translate for) famous cartoon heroes;
+2. guide those heroes from any city in the world to the United Nations Headquarters within 24 h (road + sea routing).
 
-## Available Scripts
+The project is split into two parts:
+* **Client** – React (Create React App) inside the repository root.
+* **Server** – a tiny Node/Express proxy in `server/` that hides the SeaRoutes API key and bypasses CORS.
 
-In the project directory, you can run:
+---
+## Prerequisites
+* Node ≥ 18
+* npm or pnpm / yarn
 
-### `npm start`
+---
+## Setup
+```bash
+# Clone & enter repository
+git clone <repo-url>
+cd herotalk
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+# Install client dependencies
+npm install
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+# Install proxy dependencies
+npm install --prefix server
+```
 
-### `npm test`
+---
+## Environment variables
+Create `server/.env` (not committed – see `.gitignore`):
+```
+SEAROUTES_KEY=YOUR_SEAROUTES_API_KEY
+PORT=8080            # optional, defaults to 8080
+```
+You can generate a free SeaRoutes key from https://my.searoutes.com (≈2 000 calls / month).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
+## Development workflow
+Open **two** terminals:
 
-### `npm run build`
+1. Start the SeaRoutes proxy (port 8080):
+   ```bash
+   npm start --prefix server
+   ```
+2. Start the React dev-server (port 3000):
+   ```bash
+   npm start
+   ```
+Then browse to http://localhost:3000.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
+## Available npm scripts (root)
+* `npm start` – start CRA dev server.
+* `npm test` – run test suite.
+* `npm run build` – production build in `build/`.
+* `npm run proxy` – alias for `npm start --prefix server`.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
+## Folder structure
+```
+herotalk/
+│  README.md
+│  .gitignore
+│  package.json            # client
+│
+├─src/                     # React source
+│   ├─App.js
+│   ├─NavigationPage.js    # mapping + routing logic
+│   └─…
+│
+└─server/                  # Express proxy → SeaRoutes
+    ├─index.js             # /api/sea  /api/nearest-port /api/ports-by-country
+    ├─package.json
+    └─.env.example         # template for env vars
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
+## Deployment (production)
+1. Build the client:
+   ```bash
+   npm run build
+   ```
+2. Serve the contents of `build/` **and** run the proxy on the same origin (e.g. Nginx reverse-proxy to port 8080). This avoids CORS in production.
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+## License
+MIT © 2025 HeroTalk contributors
