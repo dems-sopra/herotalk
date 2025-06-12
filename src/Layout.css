@@ -9,21 +9,18 @@
   /* Main content area */
   .main-content {
     flex: 1;
+    padding: 40px;
     padding-bottom: 80px; /* space for nav */
+    background-color: #f5f6f8;
     box-sizing: border-box;
   }
-
-  .main-content {
-    flex: 1;
-    padding: 40px;
-    background-color: #f5f6f8;
-  }
-
+  
   .sidebar .countdown-timer {
     margin-top: 40px;
     font-size: 20px;
     text-align: center;
-
+  }
+  
   /* Bottom nav bar */
   .bottom-nav {
     position: fixed;
@@ -50,11 +47,10 @@
   
   .bottom-nav a.active {
     color: #4da6ff;
-  }  
-
-
+  }
+  
   /* 🖥 Tablet & Desktop Enhancements */
-@media screen and (min-width: 768px) {
+  @media screen and (min-width: 768px) {
     .hero-selection-container {
       padding: 40px;
     }
@@ -125,3 +121,4 @@
     .hero-name {
       font-size: 17px;
     }
+  }  
